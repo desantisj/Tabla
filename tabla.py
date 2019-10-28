@@ -1,5 +1,6 @@
 import serial as ser
 import bluetooth
+from colour_follow.py import colour_track()
 
 import os
 
@@ -101,7 +102,7 @@ def mode1():
 		input()
 
 def mode2():
-	print("Mode 2")
+	colour_track()
 	input()
 	
 	
