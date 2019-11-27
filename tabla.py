@@ -14,12 +14,12 @@ from time import sleep
 def socket():
     
     try:
-	client_sock.settimeout(0.5)
+        client_sock.settimeout(0.1)
 	recvdata = client_sock.recv(1024)
 	
 	return recvdata
 	
-    except bluetooth.btcommon.BluetoothError as error:
+    except bluetooth.btcommon.BluetoothError:
 	
 	return None
     
@@ -130,11 +130,12 @@ def mode2():
     
     # keep looping
 
-    k = '0'
+    v = '0'
     
-    while ( k != 'q'):
+    while ( v != 'q'):
 		
-		k = socket()
+		v = socket()
+		
                 dist = distance()
 
                 # grab the current frame
@@ -250,7 +251,8 @@ def mode2():
     # otherwise, release the camera
     else:
             vs.release()
-
+            
+    time.sleep(0.5)
     # close all windows
     cv2.destroyAllWindows()
     
@@ -354,6 +356,7 @@ if __name__ == "__main__":
 	server_sock.listen(1)
 	client_sock,address = server_sock.accept()
 	print("accepted connection from ", address)
+	client_sock.setblocking(0)
 	
 	while True:
 		main_input()
