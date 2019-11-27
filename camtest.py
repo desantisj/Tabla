@@ -33,24 +33,24 @@ def movebackward():
 
 def moveright():
     state = "1"
-    pwm_signal = "25"
+    pwm_signal = "20"
     direction = "1"
     pwm = "1"
     set_state(direction, state, pwm, pwm_signal)
     state = "0"
-    pwm_signal = "25"
+    pwm_signal = "20"
     direction = "2"
     pwm = "2"
     set_state(direction, state, pwm, pwm_signal)
 
 def moveleft():
     state = "0"
-    pwm_signal = "25"
+    pwm_signal = "20"
     direction = "1"
     pwm = "1"
     set_state(direction, state, pwm, pwm_signal)
     state = "1"
-    pwm_signal = "25"
+    pwm_signal = "20"
     direction = "2"
     pwm = "2"
     set_state(direction, state, pwm, pwm_signal)
@@ -67,11 +67,6 @@ def motorstop():
     pwm = "2"
     set_state(direction, state, pwm, pwm_signal)
 
-def nothing(x):
-    pass
-
-
- 
 def distance():
     # set Trigger to HIGH
     GPIO.output(GPIO_TRIGGER, True)
@@ -100,12 +95,12 @@ def distance():
     return distance
    
 if __name__ == "__main__":
-    
+   
     port = '/dev/ttyACM0'
     #Serial object for communication with Arduino
     s = ser.Serial(port,9600,timeout=5)
 
-    np.framerate = 10
+    np.framerate = 15
     #GPIO Mode (BOARD / BCM)
     GPIO.setmode(GPIO.BCM)
      
@@ -127,10 +122,6 @@ if __name__ == "__main__":
     ret = cap.set(3,640)
     ret = cap.set(4,480)
 
-    #upper and lower limits for the color yellow in HSV color space
-    lower_yellow = np.array([10,255,255])
-    upper_yellow = np.array([179,255,255])
-
     #begin capture
     while(True):
         ret, frame = cap.read()
@@ -146,26 +137,28 @@ if __name__ == "__main__":
         #Mask to extract just the yellow pixels
         #mask = cv2.inRange(hsv,lower_yellow,upper_yellow)
 
+        lower_red = np.array([170,120,70])
+        upper_red = np.array([180,255,255])
+        mask1 = cv2.inRange(hsv,lower_red,upper_red)
+        
+        # Range for upper range
+        
         # Range for lower red
         lower_red = np.array([0,120,70])
         upper_red = np.array([10,255,255])
-        mask1 = cv2.inRange(hsv, lower_red, upper_red)
-         
-        # Range for upper range
-        lower_red = np.array([170,120,70])
-        upper_red = np.array([180,255,255])
+        
         mask2 = cv2.inRange(hsv,lower_red,upper_red)
          
         # Generating the final mask to detect red color
         mask = mask1+mask2
 
         #morphological opening
-        mask = cv2.erode(mask,kernel,iterations=2)
-        mask = cv2.dilate(mask,kernel,iterations=2)
+        #mask = cv2.erode(mask,kernel,iterations=1)
+        #mask = cv2.dilate(mask,kernel,iterations=1)
 
         #morphological closing
-        mask = cv2.dilate(mask,kernel,iterations=2)
-        mask = cv2.erode(mask,kernel,iterations=2)
+        #mask = cv2.dilate(mask,kernel,iterations=1)
+        #mask = cv2.erode(mask,kernel,iterations=1)
 
         #Detect contours from the mask
         cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
@@ -196,24 +189,24 @@ if __name__ == "__main__":
                         motorstop()
                         print('stop -- ',length,dist)
 
-                elif length > 150:#turn left
+                elif length > 250:#turn left
                         moveleft()
                         print('left -- ',length,dist)
                         
-                elif length < -150:#turn right
+                elif length < -250:#turn right
                         moveright()
                         print('right -- ', length,dist)
 
-                elif length <150 or length >-150:#move forward
+                elif length < 250 or length >-250:#move forward
                         moveforward()
                         print('forward -- ', length,dist)
-                elif:
+                else :
                     motorstop()
                     sleep(0.01)
 
             else:
-                motorstop()
-                sleep(0.01)
+              motorstop()
+              sleep(0.01)
 
 
         #display the image
@@ -221,10 +214,11 @@ if __name__ == "__main__":
         #Mask image
         cv2.imshow('mask',mask)
         #Quit if user presses 'q'
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+        if cv2.waitKey(15) & 0xFF == ord('q'):
             motorstop()
             break
 
     #Release the capture
     cap.release()
     cv2.destroyAllWindows()
+    GPIO.cleanup();
