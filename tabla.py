@@ -163,9 +163,9 @@ def mode2():
                 
                 # Range for upper range
                 
-                # Range for lower red
-                lower_red = np.array([25,52,72])
-                upper_red = np.array([102,255,255])
+                # Range for lower red 96, 148, 90
+                lower_red = np.array([65,110,95])
+                upper_red = np.array([100,255,255])
                 
                 mask = cv2.inRange(hsv,lower_red,upper_red)
                  
@@ -212,15 +212,15 @@ def mode2():
                             print("stop")
                             motorstop()
 
-                        elif length > 150:#turn left
+                        elif length > 100:#turn left
                                 moveright()
                                 print('right -- ',length)
                                 
-                        elif length < -150:#turn right
+                        elif length < -100:#turn right
                                 moveleft()
                                 print('left -- ', length)
 
-                        elif length <= 150 and length >= -150:
+                        elif length <= 100 and length >= -100:
                         #move forward
                                 moveforward()
                                 print('forward -- ', length)
@@ -228,6 +228,10 @@ def mode2():
                         else:
                             print("stop1")
                             motorstop()
+
+                else:
+                    print("stop")
+                    motorstop()
 
 
         ##	# show the frame to our screen and increment the frame counter
@@ -269,12 +273,12 @@ def moveforward():
 
             print("forward")
             state = "0"
-            pwm_signal = "35"
+            pwm_signal = "100"
             direction = "1"
             pwm = "1"
             set_state(direction, state, pwm, pwm_signal)
             state = "0"
-            pwm_signal = "35"
+            pwm_signal = "100"
             direction = "2"
             pwm = "2"
             set_state(direction, state, pwm, pwm_signal)
@@ -284,12 +288,12 @@ def movebackward():
 
             print("backward")
             state = "1"
-            pwm_signal = "35"
+            pwm_signal = "40"
             direction = "1"
             pwm = "1"
             set_state(direction, state, pwm, pwm_signal)
             state = "1"
-            pwm_signal = "35"
+            pwm_signal = "40"
             direction = "2"
             pwm = "2"
             set_state(direction, state, pwm, pwm_signal)
@@ -299,12 +303,12 @@ def moveright():
 
             print ("right")
             state = "1"
-            pwm_signal = "35"
+            pwm_signal = "20"
             direction = "1"
             pwm = "1"
             set_state(direction, state, pwm, pwm_signal)
             state = "0"
-            pwm_signal = "35"
+            pwm_signal = "20"
             direction = "2"
             pwm = "2"
             set_state(direction, state, pwm, pwm_signal)
@@ -314,12 +318,12 @@ def moveleft():
 
             print ("left")
             state = "0"
-            pwm_signal = "35"
+            pwm_signal = "20"
             direction = "1"
             pwm = "1"
             set_state(direction, state, pwm, pwm_signal)
             state = "1"
-            pwm_signal = "35"
+            pwm_signal = "20"
             direction = "2"
             pwm = "2"
             set_state(direction, state, pwm, pwm_signal)
