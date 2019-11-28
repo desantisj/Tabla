@@ -24,7 +24,6 @@ def socket():
 	return None
     
 
-
 def set_state(direction, state, pwm, pwm_signal):
     data = "{},{},{},{}\r".format(direction, state, pwm, pwm_signal)
     s.write(data.encode())
@@ -111,10 +110,10 @@ def mode2():
 
     # initialize the list of tracked points, the frame counter,
     # and the coordinate deltas
-    #pts = deque(maxlen=args["buffer"])
-    #counter = 0
-    #(dX, dY) = (0, 0)
-    #direction = ""
+    pts = deque(maxlen=args["buffer"])
+    counter = 0
+    (dX, dY) = (0, 0)
+    direction = ""
 
     # if a video path was not supplied, grab the reference
     # to the webcam
@@ -126,18 +125,17 @@ def mode2():
             vs = cv2.VideoCapture(args["video"])
 
     # allow the camera or video file to warm up
-    time.sleep(2.0)
+    time.sleep(1.0)
     
     # keep looping
 
     v = '0'
     
     while ( v != 'q'):
+                dist = distance()
 		
 		v = socket()
-		
-                dist = distance()
-
+	
                 # grab the current frame
                 frame = vs.read()
 
@@ -151,7 +149,7 @@ def mode2():
 
                 # resize the frame, blur it, and convert it to the HSV
                 # color space
-                frame = imutils.resize(frame, width=200)
+                frame = imutils.resize(frame, width=600)
                 blurred = cv2.GaussianBlur(frame, (11, 11), 0)
                 hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
 
@@ -159,20 +157,20 @@ def mode2():
                 # a series of dilations and erosions to remove any small
                 # blobs left in the mask
                 
-                lower_red = np.array([170,120,70])
-                upper_red = np.array([180,255,255])
-                mask1 = cv2.inRange(hsv,lower_red,upper_red)
+##                lower_red = np.array([170,120,70])
+##                upper_red = np.array([180,255,255])
+##                mask1 = cv2.inRange(hsv,lower_red,upper_red)
                 
                 # Range for upper range
                 
                 # Range for lower red
-                lower_red = np.array([0,120,70])
-                upper_red = np.array([10,255,255])
+                lower_red = np.array([25,52,72])
+                upper_red = np.array([102,255,255])
                 
-                mask2 = cv2.inRange(hsv,lower_red,upper_red)
+                mask = cv2.inRange(hsv,lower_red,upper_red)
                  
                 # Generating the final mask to detect red color
-                mask = mask1+mask2
+                #mask = mask1+mask2
                 mask = cv2.erode(mask, None, iterations=2)
                 mask = cv2.dilate(mask, None, iterations=2)
 
@@ -200,37 +198,36 @@ def mode2():
                                 cv2.circle(frame, (int(x), int(y)), int(radius),(0, 255, 255), 2)
                                 cv2.circle(frame, center, 5, (0, 0, 255), -1)
                         #Draw a line from the center of the frame to the center of the contour
-                        cv2.line(frame,(100,100),(int(x), int(y)),(0, 0, 255), 1)
+                        cv2.line(frame,(300,300),(int(x), int(y)),(0, 0, 255), 1)
                         #Reference line
-                        cv2.line(frame,(100,0),(100,200),(0,255,0),1)
+                        cv2.line(frame,(300,0),(300,600),(0,255,0),1)
 
                         radius = int(radius)
 
                         #distance of the 'x' coordinate from the center of the frame
                         #wdith of frame is 640, hence 320
-                        length = 100-(int(x))
+                        length = 300-(int(x))
 
                         if dist < 75:
-                                motorstop()
-                                print('stop -- ', length, dist)
+                            print("stop")
+                            motorstop()
 
-                        elif length > 50:#turn left
+                        elif length > 150:#turn left
                                 moveright()
                                 print('right -- ',length)
                                 
-                        elif length < -50:#turn right
+                        elif length < -150:#turn right
                                 moveleft()
                                 print('left -- ', length)
 
-                        elif length <= 50 and length >= -50:
+                        elif length <= 150 and length >= -150:
                         #move forward
                                 moveforward()
                                 print('forward -- ', length)
 
-                        else :
+                        else:
                             print("stop1")
                             motorstop()
-                            sleep(0.01)
 
 
         ##	# show the frame to our screen and increment the frame counter
@@ -251,8 +248,10 @@ def mode2():
     # otherwise, release the camera
     else:
             vs.release()
+
+    motorstop()
             
-    time.sleep(0.5)
+
     # close all windows
     cv2.destroyAllWindows()
     
@@ -267,59 +266,63 @@ def quit_():
 	exit()
 	
 def moveforward():
-        print("forward")
-        state = "0"
-        pwm_signal = "35"
-        direction = "1"
-        pwm = "1"
-        set_state(direction, state, pwm, pwm_signal)
-        state = "0"
-        pwm_signal = "35"
-        direction = "2"
-        pwm = "2"
-        set_state(direction, state, pwm, pwm_signal)
+
+            print("forward")
+            state = "0"
+            pwm_signal = "35"
+            direction = "1"
+            pwm = "1"
+            set_state(direction, state, pwm, pwm_signal)
+            state = "0"
+            pwm_signal = "35"
+            direction = "2"
+            pwm = "2"
+            set_state(direction, state, pwm, pwm_signal)
 	
 
 def movebackward():
-        print("backward")
-        state = "1"
-        pwm_signal = "35"
-        direction = "1"
-        pwm = "1"
-        set_state(direction, state, pwm, pwm_signal)
-        state = "1"
-        pwm_signal = "35"
-        direction = "2"
-        pwm = "2"
-        set_state(direction, state, pwm, pwm_signal)
+
+            print("backward")
+            state = "1"
+            pwm_signal = "35"
+            direction = "1"
+            pwm = "1"
+            set_state(direction, state, pwm, pwm_signal)
+            state = "1"
+            pwm_signal = "35"
+            direction = "2"
+            pwm = "2"
+            set_state(direction, state, pwm, pwm_signal)
 	
 
 def moveright():
-        print ("right")
-        state = "1"
-	pwm_signal = "25"
-	direction = "1"
-	pwm = "1"
-	set_state(direction, state, pwm, pwm_signal)
-	state = "0"
-	pwm_signal = "25"
-	direction = "2"
-	pwm = "2"
-	set_state(direction, state, pwm, pwm_signal)
+
+            print ("right")
+            state = "1"
+            pwm_signal = "35"
+            direction = "1"
+            pwm = "1"
+            set_state(direction, state, pwm, pwm_signal)
+            state = "0"
+            pwm_signal = "35"
+            direction = "2"
+            pwm = "2"
+            set_state(direction, state, pwm, pwm_signal)
 
 
 def moveleft():
-        print ("left")
-        state = "0"
-	pwm_signal = "25"
-	direction = "1"
-	pwm = "1"
-	set_state(direction, state, pwm, pwm_signal)
-	state = "1"
-	pwm_signal = "25"
-	direction = "2"
-	pwm = "2"
-	set_state(direction, state, pwm, pwm_signal)
+
+            print ("left")
+            state = "0"
+            pwm_signal = "35"
+            direction = "1"
+            pwm = "1"
+            set_state(direction, state, pwm, pwm_signal)
+            state = "1"
+            pwm_signal = "35"
+            direction = "2"
+            pwm = "2"
+            set_state(direction, state, pwm, pwm_signal)
 
 
 def motorstop():
@@ -340,11 +343,11 @@ if __name__ == "__main__":
 	port = '/dev/ttyACM0'
         s = ser.Serial(port,9600,timeout=5)
         
-        GPIO.setmode(GPIO.BCM)
+        GPIO.setmode(GPIO.BOARD)
 
         #set GPIO Pins
         GPIO_TRIGGER = 18
-        GPIO_ECHO = 24
+        GPIO_ECHO = 22
 
         #set GPIO direction (IN / OUT)
         GPIO.setup(GPIO_TRIGGER, GPIO.OUT)
